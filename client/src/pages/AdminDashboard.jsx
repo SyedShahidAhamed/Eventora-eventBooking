@@ -4,6 +4,7 @@ import api from '../utils/axios';
 import { useNavigate } from 'react-router-dom';
 import TicketScanner from '../components/TicketScanner';
 import toast from 'react-hot-toast';
+import { FaRupeeSign, FaUsers, FaCheckCircle, FaTimesCircle, FaHourglassHalf, FaTrashAlt, FaCheck } from 'react-icons/fa';
 
 const AdminDashboard = () => {
     const { user } = useContext(AuthContext);
@@ -173,21 +174,21 @@ const AdminDashboard = () => {
                         <p className="text-xs font-bold uppercase tracking-[.14em] text-gray-500">Total Revenue</p>
                         <h3 className="mt-2 text-2xl font-extrabold tracking-tight text-green-600 sm:text-3xl">₹{bookings.reduce((sum, b) => b.paymentStatus === 'paid' && b.status === 'confirmed' ? sum + b.amount : sum, 0)}</h3>
                     </div>
-                    <div className="grid h-11 w-11 place-items-center rounded-full bg-green-50 text-green-700 flex items-center justify-center text-xl font-bold">₹</div>
+                    <div className="grid h-11 w-11 place-items-center rounded-full bg-green-50 text-green-700"><FaRupeeSign className="text-lg" /></div>
                 </div>
                 <div className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-6">
                     <div>
                         <p className="text-xs font-bold uppercase tracking-[.14em] text-gray-500">Paid Clients</p>
                         <h3 className="mt-2 text-2xl font-extrabold tracking-tight text-blue-600 sm:text-3xl">{new Set(bookings.filter(b => b.paymentStatus === 'paid' && b.status === 'confirmed').map(b => b.userId?._id)).size}</h3>
                     </div>
-                    <div className="grid h-11 w-11 place-items-center rounded-full bg-blue-50 text-blue-700 flex items-center justify-center text-xl font-bold">👤</div>
+                    <div className="grid h-11 w-11 place-items-center rounded-full bg-blue-50 text-blue-700"><FaUsers className="text-lg" /></div>
                 </div>
                 <div className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-6">
                     <div>
                         <p className="text-xs font-bold uppercase tracking-[.14em] text-gray-500">Pending Requests</p>
                         <h3 className="mt-2 text-2xl font-extrabold tracking-tight text-amber-600 sm:text-3xl">{bookings.filter(b => b.status === 'pending').length}</h3>
                     </div>
-                    <div className="grid h-11 w-11 place-items-center rounded-full bg-amber-50 text-amber-700 flex items-center justify-center text-xl font-bold">⏳</div>
+                    <div className="grid h-11 w-11 place-items-center rounded-full bg-amber-50 text-amber-700"><FaHourglassHalf className="text-lg" /></div>
                 </div>
             </div>
 
@@ -251,7 +252,7 @@ const AdminDashboard = () => {
                                             <span>• {event.ticketPrice === 0 ? 'Free' : `₹${event.ticketPrice}`}</span>
                                         </div>
                                     </div>
-                                    <button onClick={() => handleDeleteEvent(event._id)} className="shrink-0 rounded-lg border border-red-200 px-4 py-2 text-xs font-bold text-red-700 transition hover:bg-red-50 sm:text-sm">Delete Event</button>
+                                    <button onClick={() => handleDeleteEvent(event._id)} className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-red-700 bg-red-700 px-4 py-2 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:text-sm"><FaTrashAlt />Delete Event</button>
                                 </li>
                             ))
                         }
@@ -277,7 +278,7 @@ const AdminDashboard = () => {
                     <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                         <div className="flex items-center justify-between gap-3 border-b border-gray-100 p-4 sm:p-5">
                             <div><h2 className="text-lg font-extrabold tracking-tight text-gray-950 sm:text-xl">Booking Requests</h2><p className="mt-1 text-sm text-gray-500">Review uploaded UPI payment screenshots before approving paid bookings.</p></div>
-                            <span className="rounded-full bg-amber-100 text-amber-800 px-3 py-1 text-sm font-bold">{bookings.length} requests</span>
+                            <span className="shrink-0 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-extrabold text-amber-800 ring-1 ring-inset ring-amber-200">{bookings.length} requests</span>
                         </div>
                         <ul className="divide-y divide-gray-100">
                             {bookings.length === 0 ? <li className="p-8 text-center text-gray-500">No booking requests yet.</li> :
@@ -285,9 +286,30 @@ const AdminDashboard = () => {
                                     <li key={booking._id} className={`border-l-4 p-4 transition sm:p-5 ${booking.status === 'pending' ? 'border-l-yellow-400' : booking.status === 'confirmed' ? 'border-l-green-400' : 'border-l-red-400'}`}>
                                         <div className="flex flex-col sm:flex-row justify-between gap-3 mb-3">
                                             <div><h4 className="font-bold text-gray-900 text-lg">{booking.eventId?.title || 'Deleted Event'}</h4><p className="text-sm text-gray-500 mt-1">{booking.userId?.name} · {booking.userId?.email}</p></div>
-                                            <div className="flex sm:flex-col gap-2 sm:items-end">
-                                                <span className={`px-2 py-1 text-[10px] font-black rounded uppercase ${booking.status === 'confirmed' ? 'bg-green-100 text-green-700' : booking.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>{booking.status}</span>
-                                                {booking.status !== 'cancelled' && <span className={`px-2 py-1 text-[10px] font-black rounded uppercase ${booking.paymentStatus === 'paid' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700'}`}>{booking.paymentStatus.replace('_', ' ')}</span>}
+                                            <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end">
+                                                <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ring-1 ring-inset ${
+                                                    booking.status === 'confirmed'
+                                                        ? 'bg-green-50 text-green-700 ring-green-200'
+                                                        : booking.status === 'cancelled'
+                                                            ? 'bg-red-50 text-red-700 ring-red-200'
+                                                            : 'bg-amber-50 text-amber-800 ring-amber-200'
+                                                }`}>
+                                                    {booking.status === 'confirmed'
+                                                        ? <FaCheckCircle />
+                                                        : booking.status === 'cancelled'
+                                                            ? <FaTimesCircle />
+                                                            : <FaHourglassHalf />}
+                                                    {booking.status === 'confirmed' ? 'Confirmed' : booking.status === 'cancelled' ? 'Rejected' : 'Pending review'}
+                                                </span>
+                                                {booking.status !== 'cancelled' && (
+                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ring-1 ring-inset ${
+                                                        booking.paymentStatus === 'paid'
+                                                            ? 'bg-blue-50 text-blue-700 ring-blue-200'
+                                                            : 'bg-gray-100 text-gray-700 ring-gray-200'
+                                                    }`}>
+                                                        {booking.paymentStatus === 'paid' ? 'Paid' : 'Not paid'}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm sm:grid-cols-4 sm:p-4">
@@ -309,10 +331,31 @@ const AdminDashboard = () => {
                                             </div>
                                         )}
                                         {booking.status === 'pending' && (
-                                            <div className="flex flex-wrap gap-2 mt-4">
-                                                <button disabled={!!processingBooking} onClick={() => handleConfirmBooking(booking._id, 'paid')} className="flex-1 min-w-[140px] bg-green-50 text-green-700 hover:bg-green-600 hover:text-white border border-green-200 text-sm font-bold py-2.5 px-3 rounded-lg transition disabled:opacity-50">{processingBooking === booking._id ? 'Processing...' : '✓ Approve as Paid'}</button>
-                                                <button disabled={!!processingBooking} onClick={() => handleConfirmBooking(booking._id, 'not_paid')} className="flex-1 min-w-[140px] bg-gray-50 text-gray-700 hover:bg-gray-800 hover:text-white border border-gray-200 text-sm font-bold py-2.5 px-3 rounded-lg transition disabled:opacity-50">{processingBooking === booking._id ? 'Processing...' : '✓ Approve Undecided'}</button>
-                                                <button onClick={() => handleCancelBooking(booking._id)} className="bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-200 text-sm font-bold py-2.5 px-4 rounded-lg transition">✕ Reject</button>
+                                            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                                <button
+                                                    disabled={!!processingBooking}
+                                                    onClick={() => handleConfirmBooking(booking._id, 'paid')}
+                                                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-green-700 bg-green-700 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-green-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                >
+                                                    <FaCheckCircle />
+                                                    {processingBooking === booking._id ? 'Processing...' : 'Approve as Paid'}
+                                                </button>
+                                                <button
+                                                    disabled={!!processingBooking}
+                                                    onClick={() => handleConfirmBooking(booking._id, 'not_paid')}
+                                                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-900 bg-gray-950 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-black hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                >
+                                                    <FaCheck />
+                                                    {processingBooking === booking._id ? 'Processing...' : 'Approve Undecided'}
+                                                </button>
+                                                <button
+                                                    disabled={!!processingBooking}
+                                                    onClick={() => handleCancelBooking(booking._id)}
+                                                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-red-700 bg-red-700 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-red-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                >
+                                                    <FaTimesCircle />
+                                                    Reject
+                                                </button>
                                             </div>
                                         )}
                                     </li>
