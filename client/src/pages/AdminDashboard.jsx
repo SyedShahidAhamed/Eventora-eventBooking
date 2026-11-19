@@ -4,7 +4,7 @@ import api from '../utils/axios';
 import { useNavigate } from 'react-router-dom';
 import TicketScanner from '../components/TicketScanner';
 import toast from 'react-hot-toast';
-import { FaRupeeSign, FaUsers, FaCheckCircle, FaTimesCircle, FaHourglassHalf, FaTrashAlt, FaCheck } from 'react-icons/fa';
+import { FaRupeeSign, FaUsers, FaCheckCircle, FaTimesCircle, FaHourglassHalf, FaTrashAlt, FaCheck, FaCalendarAlt, FaMapMarkerAlt, FaTicketAlt } from 'react-icons/fa';
 
 const AdminDashboard = () => {
     const { user } = useContext(AuthContext);
@@ -236,27 +236,139 @@ const AdminDashboard = () => {
 
             {activeTab === 'events' ? (
                 <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-                    <div className="flex items-center justify-between gap-3 border-b border-gray-100 p-4 sm:p-5">
-                        <div><h2 className="text-lg font-extrabold tracking-tight text-gray-950 sm:text-xl">All Events</h2><p className="mt-1 text-sm text-gray-500">Manage your published events and available seats.</p></div>
-                        <span className="rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-sm font-bold">{events.length} events</span>
+                    <div className="flex flex-col gap-4 border-b border-gray-200 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                        <div>
+                            <p className="text-[11px] font-bold uppercase tracking-[.18em] text-gray-500">Event portfolio</p>
+                            <h2 className="mt-1 text-xl font-extrabold tracking-tight text-gray-950">All Events</h2>
+                            <p className="mt-1 text-sm text-gray-500">Manage published events, ticket availability and pricing.</p>
+                        </div>
+                        <div className="flex items-center gap-2 self-start rounded-lg border border-gray-200 bg-gray-50 px-3.5 py-2 sm:self-center">
+                            <span className="grid h-7 w-7 place-items-center rounded-md bg-gray-900 text-xs font-bold text-white">{events.length}</span>
+                            <span className="text-xs font-semibold text-gray-600">Published events</span>
+                        </div>
                     </div>
-                    <ul className="divide-y divide-gray-100">
-                        {events.length === 0 ? <li className="p-8 text-center text-gray-500">No events created yet.</li> :
-                            events.map(event => (
-                                <li key={event._id} className="flex flex-col items-start justify-between gap-3 p-4 transition hover:bg-gray-50 sm:flex-row sm:items-center sm:p-5">
-                                    <div className="min-w-0">
-                                        <h4 className="font-bold text-gray-900 text-base">{event.title}</h4>
-                                        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mt-1">
-                                            <span>{event.category}</span><span>• {new Date(event.date).toLocaleDateString()}</span>
-                                            <span>• {event.availableSeats}/{event.totalSeats} seats available</span>
-                                            <span>• {event.ticketPrice === 0 ? 'Free' : `₹${event.ticketPrice}`}</span>
+
+                    {events.length === 0 ? (
+                        <div className="px-5 py-14 text-center">
+                            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gray-100 text-gray-500">
+                                <FaCalendarAlt className="text-xl" />
+                            </div>
+                            <h3 className="mt-4 text-base font-bold text-gray-900">No events published yet</h3>
+                            <p className="mt-1 text-sm text-gray-500">Create your first event to start accepting bookings.</p>
+                            <button
+                                type="button"
+                                onClick={() => setShowEventForm(true)}
+                                className="mt-4 rounded-lg bg-gray-950 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-black"
+                            >
+                                Create your first event
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-gray-100">
+                            {events.map(event => {
+                                const totalSeats = Math.max(0, Number(event.totalSeats) || 0);
+                                const availableSeats = Math.max(0, Number(event.availableSeats) || 0);
+                                const bookedSeats = Math.max(0, totalSeats - availableSeats);
+                                const occupancy = totalSeats > 0
+                                    ? Math.min(100, Math.max(0, (bookedSeats / totalSeats) * 100))
+                                    : 0;
+                                const isSoldOut = totalSeats > 0 && availableSeats === 0;
+                                const isLowAvailability = availableSeats > 0 && totalSeats > 0 && availableSeats / totalSeats <= 0.2;
+
+                                return (
+                                    <article
+                                        key={event._id}
+                                        className="group flex flex-col gap-4 px-4 py-5 transition-colors hover:bg-gray-50/80 sm:px-6 lg:flex-row lg:items-center lg:justify-between"
+                                    >
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <span className="rounded-md bg-gray-100 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-gray-700">
+                                                    {event.category || 'General'}
+                                                </span>
+                                                <span className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                                                    isSoldOut
+                                                        ? 'bg-red-50 text-red-700'
+                                                        : isLowAvailability
+                                                            ? 'bg-amber-50 text-amber-800'
+                                                            : 'bg-green-50 text-green-700'
+                                                }`}>
+                                                    <span className={`h-1.5 w-1.5 rounded-full ${
+                                                        isSoldOut ? 'bg-red-600' : isLowAvailability ? 'bg-amber-500' : 'bg-green-600'
+                                                    }`} />
+                                                    {isSoldOut ? 'Sold out' : isLowAvailability ? 'Limited seats' : 'Available'}
+                                                </span>
+                                            </div>
+
+                                            <h3 className="mt-2 break-words text-base font-extrabold leading-snug text-gray-950 sm:text-lg">
+                                                {event.title}
+                                            </h3>
+
+                                            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-gray-500 sm:text-sm">
+                                                <span className="inline-flex items-center gap-1.5">
+                                                    <FaCalendarAlt className="text-gray-400" />
+                                                    {new Date(event.date).toLocaleDateString()}
+                                                </span>
+                                                {event.location && (
+                                                    <span className="inline-flex min-w-0 items-center gap-1.5">
+                                                        <FaMapMarkerAlt className="shrink-0 text-gray-400" />
+                                                        <span className="break-words">{event.location}</span>
+                                                    </span>
+                                                )}
+                                                <span className="inline-flex items-center gap-1.5">
+                                                    <FaTicketAlt className="text-gray-400" />
+                                                    {event.ticketPrice === 0 ? 'Free admission' : `₹${Number(event.ticketPrice).toLocaleString('en-IN')} per ticket`}
+                                                </span>
+                                            </div>
+
+                                            <div className="mt-4 max-w-xl">
+                                                <div className="mb-1.5 flex items-center justify-between gap-3 text-xs">
+                                                    <span className="font-semibold text-gray-600">Ticket capacity</span>
+                                                    <span className="font-bold tabular-nums text-gray-800">
+                                                        {bookedSeats.toLocaleString('en-IN')} booked <span className="font-medium text-gray-400">/ {totalSeats.toLocaleString('en-IN')} total</span>
+                                                    </span>
+                                                </div>
+                                                <div
+                                                    className="h-1.5 overflow-hidden rounded-full bg-gray-100"
+                                                    role="progressbar"
+                                                    aria-label={`Ticket capacity for ${event.title}`}
+                                                    aria-valuenow={Math.round(occupancy)}
+                                                    aria-valuemin={0}
+                                                    aria-valuemax={100}
+                                                >
+                                                    <div
+                                                        className={`h-full rounded-full transition-all ${
+                                                            isSoldOut ? 'bg-red-600' : isLowAvailability ? 'bg-amber-500' : 'bg-gray-900'
+                                                        }`}
+                                                        style={{ width: `${occupancy}%` }}
+                                                    />
+                                                </div>
+                                                <p className="mt-1.5 text-[11px] text-gray-500">
+                                                    {availableSeats.toLocaleString('en-IN')} of {totalSeats.toLocaleString('en-IN')} seats remaining
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <button onClick={() => handleDeleteEvent(event._id)} className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-red-700 bg-red-700 px-4 py-2 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:text-sm"><FaTrashAlt />Delete Event</button>
-                                </li>
-                            ))
-                        }
-                    </ul>
+
+                                        <div className="flex w-full items-center justify-between gap-3 border-t border-gray-100 pt-3 lg:w-auto lg:min-w-[150px] lg:flex-col lg:items-end lg:border-0 lg:pt-0">
+                                            <div className="lg:text-right">
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Ticket price</p>
+                                                <p className="mt-0.5 text-lg font-extrabold text-gray-950">
+                                                    {event.ticketPrice === 0 ? 'Free' : `₹${Number(event.ticketPrice).toLocaleString('en-IN')}`}
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDeleteEvent(event._id)}
+                                                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-3.5 py-2 text-xs font-bold text-red-700 transition hover:border-red-700 hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                            >
+                                                <FaTrashAlt />
+                                                Delete event
+                                            </button>
+                                        </div>
+                                    </article>
+                                );
+                            })}
+                        </div>
+                    )}
                 </section>
             ) : (
                 <div className="space-y-6">
