@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
+import toast from 'react-hot-toast';
 
 const DigitalTicket = ({ booking }) => {
     const [qrImage, setQrImage] = useState('');
@@ -17,7 +18,10 @@ const DigitalTicket = ({ booking }) => {
                 .then(url => {
                     if (active) setQrImage(url);
                 })
-                .catch(err => console.error('QR generation failed', err));
+                .catch(err => {
+                    console.error('QR generation failed', err);
+                    if (active) toast.error('Failed to generate ticket QR code');
+                });
         }
 
         return () => {
@@ -32,10 +36,10 @@ const DigitalTicket = ({ booking }) => {
     const copyTicketCode = async () => {
         try {
             await navigator.clipboard.writeText(booking.ticketCode);
-            alert('Ticket ID copied successfully!');
+            toast.success('Ticket ID copied successfully!');
         } catch (error) {
             console.error('Copy failed:', error);
-            alert('Unable to copy Ticket ID. Please copy it manually.');
+            toast.error('Unable to copy Ticket ID. Please copy it manually.');
         }
     };
 
@@ -96,6 +100,7 @@ const DigitalTicket = ({ booking }) => {
                 </p>
 
                 <button
+                    type="button"
                     onClick={copyTicketCode}
                     className="block mx-auto mt-2 text-xs font-bold text-blue-600 hover:text-blue-800"
                 >
