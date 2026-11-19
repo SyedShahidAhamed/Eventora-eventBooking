@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f9fafb;
+}
+
+
+/* Smooth reveal for the generated Eventora UPI payment QR. */
+@keyframes eventoraQrReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.82) rotateY(14deg);
+    filter: blur(7px);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.025) rotateY(0);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotateY(0);
+    filter: blur(0);
+  }
+}
+.qr-reveal {
+  animation: eventoraQrReveal 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .qr-reveal { animation: none; }
+}
+
+/* Eventora full-screen UPI checkout */
+.payment-screen { font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+.payment-marquee { overflow: hidden; white-space: nowrap; border-radius: 14px; background: #f8fafc; padding: 13px 0; }
+.payment-marquee-track { display: flex; align-items: center; width: max-content; gap: 34px; animation: paymentMarquee 19s linear infinite; }
+.payment-marquee:hover .payment-marquee-track { animation-play-state: paused; }
+.payment-brand { display: inline-flex; align-items: center; font-size: 15px; font-weight: 900; letter-spacing: -.04em; }
+.brand-phonepe { color: #5f259f; }
+.brand-googlepay { color: #4285f4; }
+.brand-paytm { color: #00a5e8; }
+.brand-supermoney { color: #16a34a; }
+@keyframes paymentMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .payment-marquee-track { animation: none; } }
+
+/* Checkout styling follows Eventora's existing neutral black, white and gray palette. */
+.payment-screen { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.payment-marquee { overflow: hidden; white-space: nowrap; border-radius: 10px; background: #f3f4f6; padding: 11px 0; }
+.payment-marquee-track { display: flex; align-items: center; width: max-content; gap: 34px; animation: paymentMarquee 19s linear infinite; }
+.payment-marquee:hover .payment-marquee-track { animation-play-state: paused; }
+.payment-brand { display: inline-flex; align-items: center; color: #374151; font-size: 14px; font-weight: 800; letter-spacing: -.035em; }
+@keyframes paymentMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .payment-marquee-track { animation: none; } }
