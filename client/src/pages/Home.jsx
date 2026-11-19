@@ -123,7 +123,7 @@ const Home = () => {
                                     </div>
                                     <p className="text-xs text-gray-500 mb-4">{event.availableSeats} of {event.totalSeats} seats remaining</p>
                                     <Link to={`/events/${event._id}`} className="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold py-2 rounded-lg transition">
-                                        View Details
+                                        View Event Details
                                     </Link>
                                 </div>
                             </div>
