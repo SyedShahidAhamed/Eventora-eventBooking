@@ -72,7 +72,12 @@ exports.login = async (req, res) => {
 exports.verifyOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
-        const validOTP = await OTP.findOne({ email, otp, action: 'account_verification' });
+        const validOTP = await OTP.findOne({
+            email,
+            otp,
+            action: 'account_verification',
+            expiresAt: { $gt: new Date() }
+        });
 
         if (!validOTP) {
             return res.status(400).json({ message: 'Invalid or expired OTP' });
