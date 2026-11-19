@@ -13,6 +13,12 @@ const MAX_PROOF_LENGTH = 3_000_000;
 // Send booking OTP
 exports.sendBookingOTP = async (req, res) => {
     try {
+        if (req.user?.role === 'admin') {
+            return res.status(403).json({
+                message: 'Admin accounts cannot request booking OTPs. Please use an attendee account.'
+            });
+        }
+
         const otp = generateOTP();
 
         await OTP.findOneAndDelete({
@@ -48,6 +54,12 @@ exports.sendBookingOTP = async (req, res) => {
 // Submit event booking
 exports.bookEvent = async (req, res) => {
     try {
+        if (req.user?.role === 'admin') {
+            return res.status(403).json({
+                message: 'Admin accounts cannot book tickets. Please use an attendee account.'
+            });
+        }
+
         const { eventId, otp } = req.body;
 
         const quantity = Number(req.body.quantity || 1);
