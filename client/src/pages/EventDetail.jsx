@@ -79,6 +79,7 @@ const EventDetail = () => {
     }
 
     const isSoldOut = event.availableSeats <= 0;
+
     const maxSelectable = Math.max(
         1,
         Math.min(5, event.availableSeats)
@@ -89,6 +90,7 @@ const EventDetail = () => {
     return (
         <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden mt-8">
 
+            {/* Event Image */}
             {event.image ? (
                 <img
                     src={event.image}
@@ -129,14 +131,17 @@ const EventDetail = () => {
 
                         <div className="space-y-4 mb-6">
 
+                            {/* Ticket Price */}
                             <div className="flex items-center gap-4 text-gray-600">
                                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
                                     <FaMoneyBillWave />
                                 </div>
+
                                 <div>
                                     <p className="text-sm font-semibold text-gray-400 uppercase">
                                         Ticket Price
                                     </p>
+
                                     <p className="font-bold text-gray-800 text-lg">
                                         {Number(event.ticketPrice) === 0
                                             ? <span className="text-green-600">Free</span>
@@ -145,42 +150,51 @@ const EventDetail = () => {
                                 </div>
                             </div>
 
+                            {/* Availability */}
                             <div className="flex items-center gap-4 text-gray-600">
                                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
                                     <FaChair />
                                 </div>
+
                                 <div>
                                     <p className="text-sm font-semibold text-gray-400 uppercase">
                                         Availability
                                     </p>
+
                                     <p className="font-bold text-gray-800">
                                         {event.availableSeats} / {event.totalSeats}
                                     </p>
                                 </div>
                             </div>
 
+                            {/* Date */}
                             <div className="flex items-center gap-4 text-gray-600">
                                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
                                     <FaCalendarAlt />
                                 </div>
+
                                 <div>
                                     <p className="text-sm font-semibold text-gray-400 uppercase">
                                         Date
                                     </p>
+
                                     <p className="font-bold text-gray-800">
                                         {new Date(event.date).toLocaleDateString()}
                                     </p>
                                 </div>
                             </div>
 
+                            {/* Location */}
                             <div className="flex items-center gap-4 text-gray-600">
                                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
                                     <FaMapMarkerAlt />
                                 </div>
+
                                 <div>
                                     <p className="text-sm font-semibold text-gray-400 uppercase">
                                         Location
                                     </p>
+
                                     <p className="font-bold text-gray-800">
                                         {event.location}
                                     </p>
@@ -196,6 +210,7 @@ const EventDetail = () => {
 
                         <div className="relative mb-4">
 
+                            {/* Dropdown Button */}
                             <button
                                 type="button"
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -219,6 +234,7 @@ const EventDetail = () => {
                                 />
                             </button>
 
+                            {/* Dropdown Options */}
                             {dropdownOpen && (
                                 <>
                                     <div
@@ -229,7 +245,11 @@ const EventDetail = () => {
                                     <div
                                         role="listbox"
                                         aria-label="Select number of tickets"
-                                        className="absolute left-0 right-0 top-full mt-2 z-20 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden py-1 animate-dropdown"
+                                        className="absolute left-0 right-0 top-full mt-2 z-20 bg-white border border-gray-200 rounded-xl shadow-xl max-h-40 overflow-y-auto overflow-x-hidden py-1 animate-dropdown"
+                                        style={{
+                                            scrollbarWidth: 'thin',
+                                            scrollbarColor: '#9ca3af #f3f4f6'
+                                        }}
                                     >
                                         {Array.from(
                                             { length: maxSelectable },
@@ -277,7 +297,7 @@ const EventDetail = () => {
                             </strong>
                         </div>
 
-                        {/* Booking Button */}
+                        {/* Continue Booking */}
                         <button
                             onClick={startBooking}
                             disabled={isSoldOut || bookingLoading}
@@ -307,6 +327,7 @@ const EventDetail = () => {
                         opacity: 0;
                         transform: translateY(-8px);
                     }
+
                     to {
                         opacity: 1;
                         transform: translateY(0);
@@ -315,6 +336,24 @@ const EventDetail = () => {
 
                 .animate-dropdown {
                     animation: dropdownOpen 0.18s ease-out;
+                }
+
+                .animate-dropdown::-webkit-scrollbar {
+                    width: 6px;
+                }
+
+                .animate-dropdown::-webkit-scrollbar-track {
+                    background: #f3f4f6;
+                    border-radius: 10px;
+                }
+
+                .animate-dropdown::-webkit-scrollbar-thumb {
+                    background: #9ca3af;
+                    border-radius: 10px;
+                }
+
+                .animate-dropdown::-webkit-scrollbar-thumb:hover {
+                    background: #6b7280;
                 }
             `}</style>
 
