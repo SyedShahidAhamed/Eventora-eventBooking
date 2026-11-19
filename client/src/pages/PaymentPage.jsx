@@ -12,8 +12,7 @@ import {
     FaTimes,
     FaShieldAlt,
     FaCheckCircle,
-    FaCreditCard,
-    FaCheck
+    FaCreditCard
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import api from '../utils/axios';
@@ -231,7 +230,7 @@ const PaymentPage = () => {
                             <p className="text-sm font-black tracking-[.16em] text-gray-900">
                                 EVENTORA
                             </p>
-                            <p className="text-[10px] font-semibold tracking-[.2em] text-gray-500">
+                            <p className="text-[11px] font-semibold tracking-[.18em] text-gray-500">
                                 SECURE CHECKOUT
                             </p>
                         </div>
@@ -255,7 +254,7 @@ const PaymentPage = () => {
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 
                     <div>
-                        <p className="text-xs font-bold uppercase tracking-[.24em] text-gray-500">
+                        <p className="text-sm font-bold uppercase tracking-[.2em] text-gray-500">
                             Booking confirmation
                         </p>
 
@@ -268,7 +267,7 @@ const PaymentPage = () => {
                         </p>
                     </div>
 
-                    <div className="inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm">
+                    <div className="inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm">
                         <FaShieldAlt />
                         Secure checkout
                     </div>
@@ -291,7 +290,7 @@ const PaymentPage = () => {
                                 {step.number}
                             </div>
 
-                            <span className="text-[10px] font-bold text-gray-700 sm:text-sm">
+                            <span className="text-xs font-bold text-gray-700 sm:text-sm">
                                 {step.title}
                             </span>
                         </div>
@@ -308,7 +307,7 @@ const PaymentPage = () => {
                     <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
 
                         <div className="border-b border-gray-200 px-5 py-5 sm:px-7">
-                            <p className="text-xs font-bold uppercase tracking-[.18em] text-gray-500">
+                            <p className="text-sm font-bold uppercase tracking-[.16em] text-gray-500">
                                 Your booking
                             </p>
 
@@ -351,8 +350,8 @@ const PaymentPage = () => {
                             {/* Booking Summary */}
                             <div className="my-5 grid grid-cols-2 gap-3">
 
-                                <div className="rounded-xl border border-gray-200 p-4">
-                                    <p className="text-xs font-medium text-gray-500">
+                                <div className="rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-amber-300">
+                                    <p className="text-sm font-medium text-gray-500">
                                         Tickets
                                     </p>
 
@@ -362,8 +361,8 @@ const PaymentPage = () => {
                                     </p>
                                 </div>
 
-                                <div className="rounded-xl border border-gray-200 p-4">
-                                    <p className="text-xs font-medium text-gray-500">
+                                <div className="rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-amber-300">
+                                    <p className="text-sm font-medium text-gray-500">
                                         Total payable
                                     </p>
 
@@ -374,42 +373,18 @@ const PaymentPage = () => {
 
                             </div>
 
-                            {/* UPI Apps */}
+                            {/* Payment app guidance */}
                             {isPaid && (
-                                <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
-
-                                    <div className="flex items-center justify-between gap-3">
-                                        <div>
-                                            <p className="text-sm font-bold">
-                                                Pay using any UPI app
-                                            </p>
-                                            <p className="mt-1 text-xs text-gray-500">
-                                                Choose your preferred payment application.
-                                            </p>
-                                        </div>
-
-                                        <FaQrcode className="text-2xl text-gray-700" />
+                                <div className="mb-6 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50/70 p-4">
+                                    <FaQrcode className="shrink-0 text-2xl text-amber-700" />
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-900">
+                                            Ready to pay?
+                                        </p>
+                                        <p className="mt-1 text-sm leading-relaxed text-gray-600">
+                                            Scan the secure UPI QR code on the right using your preferred payment app.
+                                        </p>
                                     </div>
-
-                                    <div className="payment-marquee mt-4">
-                                        <div className="payment-marquee-track">
-                                            {[
-                                                'PhonePe',
-                                                'Google Pay',
-                                                'Paytm',
-                                                'super.money',
-                                                'PhonePe',
-                                                'Google Pay',
-                                                'Paytm',
-                                                'super.money'
-                                            ].map((name, i) => (
-                                                <span key={i} className="payment-brand">
-                                                    {name}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-
                                 </div>
                             )}
 
@@ -437,7 +412,7 @@ const PaymentPage = () => {
                                         className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-center text-lg font-bold tracking-[.5em] text-gray-900 outline-none transition placeholder:tracking-normal placeholder:font-normal focus:border-gray-700 focus:ring-2 focus:ring-gray-200"
                                     />
 
-                                    <p className="mt-2 text-xs text-gray-500">
+                                    <p className="mt-2 text-sm text-gray-500">
                                         Enter the one-time password sent to your registered email.
                                     </p>
                                 </div>
@@ -461,7 +436,7 @@ const PaymentPage = () => {
                                                     : 'Upload payment screenshot'}
                                             </span>
 
-                                            <span className="mt-1 text-xs text-gray-500">
+                                            <span className="mt-1 text-sm text-gray-500">
                                                 PNG, JPG or WEBP · Maximum 8 MB
                                             </span>
 
@@ -473,7 +448,7 @@ const PaymentPage = () => {
                                             />
 
                                             {proofName && (
-                                                <span className="mt-3 max-w-full break-all rounded-lg bg-white px-3 py-2 text-xs font-semibold text-gray-700">
+                                                <span className="mt-3 max-w-full break-all rounded-lg bg-white px-3 py-2 text-sm font-semibold text-gray-700">
                                                     <FaCheckCircle className="mr-1 inline text-green-600" />
                                                     {proofName}
                                                 </span>
@@ -511,14 +486,14 @@ const PaymentPage = () => {
 
                                 <button
                                     disabled={busy}
-                                    className="w-full rounded-xl bg-gray-900 px-5 py-4 text-sm font-extrabold text-white shadow-md transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="w-full rounded-xl border border-amber-500 bg-gray-950 px-5 py-4 text-sm font-extrabold text-white shadow-md transition duration-200 hover:-translate-y-0.5 hover:border-amber-400 hover:bg-black hover:shadow-[0_8px_24px_rgba(212,175,55,0.22)] focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
                                 >
                                     {busy
                                         ? 'Submitting booking...'
                                         : 'Confirm & submit booking'}
                                 </button>
 
-                                <p className="flex items-center justify-center gap-2 text-center text-xs text-gray-500">
+                                <p className="flex items-center justify-center gap-2 text-center text-sm text-gray-500">
                                     <FaLock />
                                     Your booking stays pending until admin verification.
                                 </p>
@@ -531,7 +506,7 @@ const PaymentPage = () => {
                     <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
 
                         <div className="border-b border-gray-200 px-5 py-5 sm:px-7">
-                            <p className="text-xs font-bold uppercase tracking-[.18em] text-gray-500">
+                            <p className="text-sm font-bold uppercase tracking-[.16em] text-gray-500">
                                 Payment
                             </p>
 
@@ -545,7 +520,7 @@ const PaymentPage = () => {
                             <div className="p-5 sm:p-7">
 
                                 {/* UPI Brand Names */}
-                                <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 border-b border-gray-100 pb-5 text-xs font-bold text-gray-600 sm:text-sm">
+                                <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 border-b border-gray-100 pb-5 text-sm font-bold text-gray-600">
                                     <span>PhonePe</span>
                                     <span>Google Pay</span>
                                     <span>Paytm</span>
@@ -553,16 +528,16 @@ const PaymentPage = () => {
                                 </div>
 
                                 {/* QR Payment Card */}
-                                <div className="mx-auto mt-6 flex max-w-md flex-col items-center rounded-2xl border border-gray-200 bg-gray-50 px-4 py-7 sm:px-6">
+                                <div className="mx-auto mt-6 flex max-w-md flex-col items-center rounded-2xl border border-amber-200 bg-gradient-to-b from-amber-50/50 to-gray-50 px-4 py-7 shadow-sm sm:px-6">
 
                                     <div className="flex items-center gap-2">
-                                        <span className="h-2 w-2 rounded-full bg-black animate-pulse" />
-                                        <p className="text-xs font-bold uppercase tracking-[.18em] text-gray-600">
+                                        <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                                        <p className="text-sm font-bold uppercase tracking-[.16em] text-gray-600">
                                             Scan to make payment
                                         </p>
                                     </div>
 
-                                    {/* Actual QR with Black Scanning Animation */}
+                                    {/* Actual UPI QR with premium gold scanning animation */}
                                     {qr ? (
                                         <div className="qr-scan-container relative mt-5 overflow-hidden rounded-xl border border-gray-300 bg-white p-3 shadow-sm">
 
@@ -597,11 +572,11 @@ const PaymentPage = () => {
                                         Pay to {UPI_NAME}
                                     </p>
 
-                                    <p className="mt-1 break-all text-xs text-gray-500">
+                                    <p className="mt-1 break-all text-sm text-gray-500">
                                         {UPI_ID}
                                     </p>
 
-                                    <div className="mt-4 flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-600">
+                                    <div className="mt-4 flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-600">
                                         <FaLock className="text-gray-900" />
                                         Secure UPI payment
                                     </div>
@@ -680,7 +655,7 @@ const PaymentPage = () => {
 
                 {/* Footer */}
                 <div className="mt-7 rounded-xl border border-gray-200 bg-white p-4">
-                    <p className="flex items-center justify-center gap-2 text-center text-xs font-medium text-gray-500">
+                    <p className="flex items-center justify-center gap-2 text-center text-sm font-medium text-gray-500">
                         <FaShieldAlt className="text-gray-900" />
                         Payments are manually reviewed by the Eventora admin before booking approval.
                     </p>
@@ -688,7 +663,7 @@ const PaymentPage = () => {
 
             </div>
 
-            {/* Black QR Scanning Animation */}
+            {/* Premium gold QR scanning animation */}
             <style>{`
                 @keyframes qrScan {
                     0% {
@@ -716,7 +691,7 @@ const PaymentPage = () => {
 
                 .qr-scan-frame {
                     box-shadow:
-                        inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+                        inset 0 0 0 1px rgba(212, 175, 55, 0.28);
                 }
 
                 .qr-scan-line {
@@ -728,14 +703,15 @@ const PaymentPage = () => {
                     background: linear-gradient(
                         90deg,
                         transparent 0%,
-                        rgba(0, 0, 0, 0.35) 12%,
-                        #000000 50%,
-                        rgba(0, 0, 0, 0.35) 88%,
+                        rgba(212, 175, 55, 0.4) 12%,
+                        #D4AF37 50%,
+                        rgba(212, 175, 55, 0.4) 88%,
                         transparent 100%
                     );
                     box-shadow:
-                        0 0 5px rgba(0, 0, 0, 0.45),
-                        0 0 12px rgba(0, 0, 0, 0.2);
+                        0 0 5px rgba(212, 175, 55, 0.7),
+                        0 0 12px rgba(212, 175, 55, 0.45),
+                        0 0 20px rgba(212, 175, 55, 0.2);
                     animation: qrScan 2.8s ease-in-out infinite;
                 }
 
