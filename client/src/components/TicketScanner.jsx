@@ -8,16 +8,17 @@ const TicketScanner = ({ onDetected, onClose }) => {
     const callbackRef = useRef(onDetected);
     const mountedRef = useRef(false);
 
+    const [showInstructions, setShowInstructions] = useState(true);
     const [status, setStatus] = useState('Initializing camera...');
     const [error, setError] = useState('');
     const [cameraReady, setCameraReady] = useState(false);
 
-    // Instructions have their own visibility state.
-    const [showInstructions, setShowInstructions] = useState(true);
-
     callbackRef.current = onDetected;
 
+    // Start camera only after instructions are closed
     useEffect(() => {
+        if (showInstructions) return;
+
         let scanner = null;
         let cancelled = false;
 
@@ -31,7 +32,7 @@ const TicketScanner = ({ onDetected, onClose }) => {
 
                 if (!window.isSecureContext) {
                     throw new Error(
-                        'Camera requires HTTPS or localhost.'
+                        'Camera requires HTTPS or localhost. Please open the secure website.'
                     );
                 }
 
@@ -77,13 +78,19 @@ const TicketScanner = ({ onDetected, onClose }) => {
                                 await scanner.stop();
                             }
                         } catch (stopError) {
-                            console.warn('Scanner stop:', stopError);
+                            console.warn(
+                                'Unable to stop scanner:',
+                                stopError
+                            );
                         }
 
                         try {
                             scanner.clear();
                         } catch (clearError) {
-                            console.warn('Scanner clear:', clearError);
+                            console.warn(
+                                'Unable to clear scanner:',
+                                clearError
+                            );
                         }
 
                         if (!cancelled && mountedRef.current) {
@@ -112,13 +119,16 @@ const TicketScanner = ({ onDetected, onClose }) => {
                     let message = err?.message || 'Unable to start camera.';
 
                     if (err?.name === 'NotAllowedError') {
-                        message = 'Camera permission denied. Allow camera access in browser settings.';
+                        message =
+                            'Camera permission denied. Allow camera access in Chrome site settings and reload.';
                     } else if (err?.name === 'NotFoundError') {
                         message = 'No camera was found on this device.';
                     } else if (err?.name === 'NotReadableError') {
-                        message = 'Camera is already being used by another application.';
+                        message =
+                            'Camera is already being used by another application. Close other camera apps and try again.';
                     } else if (err?.name === 'OverconstrainedError') {
-                        message = 'The requested camera is unavailable.';
+                        message =
+                            'The requested camera is unavailable. Try another camera.';
                     }
 
                     setError(message);
@@ -141,74 +151,148 @@ const TicketScanner = ({ onDetected, onClose }) => {
                         if (activeScanner.isScanning) {
                             await activeScanner.stop();
                         }
-                    } catch (err) {
-                        console.warn('Scanner cleanup:', err);
+                    } catch (stopError) {
+                        console.warn(
+                            'Scanner stop cleanup:',
+                            stopError
+                        );
                     }
 
                     try {
                         activeScanner.clear();
-                    } catch (err) {
-                        console.warn('Scanner clear:', err);
+                    } catch (clearError) {
+                        console.warn(
+                            'Scanner clear cleanup:',
+                            clearError
+                        );
                     }
                 };
 
                 cleanup();
             }
         };
-    }, []);
+    }, [showInstructions]);
 
-    return (
-        <>
-            {/* Main Scanner */}
-            <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+    // STEP 1: Instructions popup
+    if (showInstructions) {
+        return (
+            <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
 
-                <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-5 max-h-[95vh] overflow-y-auto">
+                <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
 
-                    {/* Scanner Header */}
-                    <div className="flex justify-between items-center mb-4">
-                        <div>
-                            <h3 className="text-xl font-extrabold text-gray-900">
-                                Scan Event Ticket
-                            </h3>
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-extrabold text-gray-900">
+                            Scan Event Ticket
+                        </h2>
 
-                            <p className="text-sm text-gray-500 mt-1">
-                                Scan the attendee's QR code to verify entry.
-                            </p>
-                        </div>
-
-                        {/* This X closes the entire scanner */}
                         <button
                             type="button"
-                            onClick={onClose}
-                            className="text-3xl text-gray-500 hover:text-black"
-                            aria-label="Close scanner"
+                            onClick={() => setShowInstructions(false)}
+                            className="text-3xl text-gray-500 hover:text-black transition"
+                            aria-label="Close instructions"
                         >
                             ×
                         </button>
                     </div>
 
-                    {/* Camera Status */}
-                    <div className="mb-4 flex items-center gap-2">
-                        <span
-                            className={`h-2.5 w-2.5 rounded-full ${
-                                cameraReady
-                                    ? 'bg-green-500'
-                                    : error
-                                    ? 'bg-red-500'
-                                    : 'bg-yellow-500 animate-pulse'
-                            }`}
-                        />
+                    <p className="text-gray-500 mt-2">
+                        Scan the attendee's QR code to verify entry.
+                    </p>
 
-                        <p className="text-sm font-semibold text-gray-700">
-                            {status}
+                    <hr className="my-5" />
+
+                    <div className="rounded-xl bg-gray-50 p-4">
+                        <h3 className="text-base font-bold text-gray-800">
+                            Scanning instructions
+                        </h3>
+
+                        <ul className="mt-3 space-y-2 text-sm text-gray-600">
+                            <li>
+                                • Allow camera permission in your browser.
+                            </li>
+                            <li>
+                                • Position the attendee QR code inside the scanning box.
+                            </li>
+                            <li>
+                                • Keep the QR code clearly visible and steady.
+                            </li>
+                            <li>
+                                • Use HTTPS when accessing the deployed website.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                        <button
+                            type="button"
+                            onClick={() => setShowInstructions(false)}
+                            className="rounded-lg bg-black px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition"
+                        >
+                            Continue Scanning
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        );
+    }
+
+    // STEP 2: Camera scanning screen only
+    return (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-5 max-h-[95vh] overflow-y-auto">
+
+                {/* Scanner Header */}
+                <div className="flex justify-between items-center mb-4">
+
+                    <div>
+                        <h3 className="text-xl font-extrabold text-gray-900">
+                            Scan Event Ticket
+                        </h3>
+
+                        <p className="text-sm text-gray-500 mt-1">
+                            Scan the attendee's QR code to verify entry.
                         </p>
                     </div>
 
-                    {error && (
-                        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
-                            <p className="text-sm text-red-700">
-                                {error}
-                            </p>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="text-3xl text-gray-500 hover:text-black transition"
+                        aria-label="Close scanner"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+                {/* Camera Status */}
+                <div className="mb-4 flex items-center gap-2">
+
+                    <span
+                        className={`h-2.5 w-2.5 rounded-full ${
+                            cameraReady
+                                ? 'bg-green-500'
+                                : error
+                                ? 'bg-red-500'
+                                : 'bg-yellow-500 animate-pulse'
+                        }`}
+                    />
+
+                    <p className="text-sm font-semibold text-gray-700">
+                        {status}
+                    </p>
+
+                </div>
+
+                {/* Camera Error */}
+                {error && (
+                    <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
+
+                        <p className="text-sm text-red-700">
+                            {error}
+                        </p>
 
                             <button
                                 type="button"
@@ -217,105 +301,35 @@ const TicketScanner = ({ onDetected, onClose }) => {
                             >
                                 Reload page and try again
                             </button>
-                        </div>
-                    )}
 
-                    {/* QR Camera */}
-                    <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-black">
-                        <div
-                            id="eventora-ticket-reader"
-                            className="w-full"
-                        />
                     </div>
+                )}
 
-                    {/* Reopen Instructions */}
-                    {!showInstructions && (
-                        <button
-                            type="button"
-                            onClick={() => setShowInstructions(true)}
-                            className="mt-4 text-sm font-semibold text-gray-600 underline"
-                        >
-                            View scanning instructions
-                        </button>
-                    )}
+                {/* QR Camera */}
+                <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-black">
 
-                    {/* Scanner Footer */}
-                    <div className="mt-4 flex justify-end">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
-                        >
-                            Close Scanner
-                        </button>
-                    </div>
+                    <div
+                        id="eventora-ticket-reader"
+                        className="w-full"
+                    />
+
                 </div>
+
+                {/* Footer */}
+                <div className="mt-4 flex justify-end">
+
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition"
+                    >
+                        Close Scanner
+                    </button>
+
+                </div>
+
             </div>
-
-            {/* Separate Instructions Popup */}
-            {showInstructions && (
-                <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
-
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
-
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-2xl font-extrabold text-gray-900">
-                                Scan Event Ticket
-                            </h2>
-
-                            {/* This X ONLY closes instructions */}
-                            <button
-                                type="button"
-                                onClick={() => setShowInstructions(false)}
-                                className="text-3xl text-gray-500 hover:text-black"
-                                aria-label="Close instructions"
-                            >
-                                ×
-                            </button>
-                        </div>
-
-                        <p className="text-gray-500 mt-2">
-                            Scan the attendee's QR code to verify entry.
-                        </p>
-
-                        <div className="flex items-center gap-3 mt-5">
-                            <span className={`h-3 w-3 rounded-full ${
-                                cameraReady ? 'bg-green-500' : 'bg-yellow-500'
-                            }`} />
-
-                            <p className="text-sm font-semibold text-gray-700">
-                                {status}
-                            </p>
-                        </div>
-
-                        <hr className="my-5" />
-
-                        <div className="rounded-xl bg-gray-50 p-4">
-                            <h3 className="font-bold text-gray-800">
-                                Scanning instructions
-                            </h3>
-
-                            <ul className="mt-3 space-y-2 text-sm text-gray-600">
-                                <li>• Allow camera permission in your browser.</li>
-                                <li>• Position the attendee QR code inside the scanning box.</li>
-                                <li>• Keep the QR code clearly visible and steady.</li>
-                                <li>• Use HTTPS when accessing the deployed website.</li>
-                            </ul>
-                        </div>
-
-                        <div className="mt-6 flex justify-end">
-                            <button
-                                type="button"
-                                onClick={() => setShowInstructions(false)}
-                                className="rounded-lg bg-black px-6 py-3 font-semibold text-white hover:bg-gray-800"
-                            >
-                                Continue Scanning
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </>
+        </div>
     );
 };
 
