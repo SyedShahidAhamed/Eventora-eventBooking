@@ -12,7 +12,9 @@ const TicketScanner = ({ onDetected, onClose }) => {
     const [error, setError] = useState('');
     const [cameraReady, setCameraReady] = useState(false);
 
-    // Always use the latest callback from the parent component.
+    // Instructions have their own visibility state.
+    const [showInstructions, setShowInstructions] = useState(true);
+
     callbackRef.current = onDetected;
 
     useEffect(() => {
@@ -29,7 +31,7 @@ const TicketScanner = ({ onDetected, onClose }) => {
 
                 if (!window.isSecureContext) {
                     throw new Error(
-                        'Camera requires HTTPS or localhost. Please open the secure website.'
+                        'Camera requires HTTPS or localhost.'
                     );
                 }
 
@@ -75,37 +77,31 @@ const TicketScanner = ({ onDetected, onClose }) => {
                                 await scanner.stop();
                             }
                         } catch (stopError) {
-                            console.warn(
-                                'Unable to stop scanner:',
-                                stopError
-                            );
+                            console.warn('Scanner stop:', stopError);
                         }
 
                         try {
                             scanner.clear();
                         } catch (clearError) {
-                            console.warn(
-                                'Unable to clear scanner:',
-                                clearError
-                            );
+                            console.warn('Scanner clear:', clearError);
                         }
 
                         if (!cancelled && mountedRef.current) {
-                            // Send the original decoded ticket value
-                            // to the existing parent validation logic.
                             callbackRef.current?.(decodedText);
                         }
                     },
                     () => {
-                        // Normal QR decoding failures are expected
-                        // while the camera searches for a QR code.
+                        // Normal QR decoding failures are ignored.
                     }
                 );
 
                 if (!cancelled && mountedRef.current) {
                     setCameraReady(true);
-                    setStatus('Camera active. Scan the attendee QR code.');
+                    setStatus(
+                        'Camera active. Scan the attendee QR code.'
+                    );
                 }
+
             } catch (err) {
                 console.error('Eventora QR scanner error:', err);
 
@@ -116,17 +112,13 @@ const TicketScanner = ({ onDetected, onClose }) => {
                     let message = err?.message || 'Unable to start camera.';
 
                     if (err?.name === 'NotAllowedError') {
-                        message =
-                            'Camera permission denied. Allow camera access in Chrome site settings and reload.';
+                        message = 'Camera permission denied. Allow camera access in browser settings.';
                     } else if (err?.name === 'NotFoundError') {
-                        message =
-                            'No camera was found on this device.';
+                        message = 'No camera was found on this device.';
                     } else if (err?.name === 'NotReadableError') {
-                        message =
-                            'Camera is already being used by another application. Close other camera apps and try again.';
+                        message = 'Camera is already being used by another application.';
                     } else if (err?.name === 'OverconstrainedError') {
-                        message =
-                            'The requested camera is unavailable. Try another camera.';
+                        message = 'The requested camera is unavailable.';
                     }
 
                     setError(message);
@@ -149,20 +141,14 @@ const TicketScanner = ({ onDetected, onClose }) => {
                         if (activeScanner.isScanning) {
                             await activeScanner.stop();
                         }
-                    } catch (stopError) {
-                        console.warn(
-                            'Scanner stop cleanup:',
-                            stopError
-                        );
+                    } catch (err) {
+                        console.warn('Scanner cleanup:', err);
                     }
 
                     try {
                         activeScanner.clear();
-                    } catch (clearError) {
-                        console.warn(
-                            'Scanner clear cleanup:',
-                            clearError
-                        );
+                    } catch (err) {
+                        console.warn('Scanner clear:', err);
                     }
                 };
 
@@ -172,39 +158,37 @@ const TicketScanner = ({ onDetected, onClose }) => {
     }, []);
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+        <>
+            {/* Main Scanner */}
+            <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
 
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-5 max-h-[95vh] overflow-y-auto">
+                <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-5 max-h-[95vh] overflow-y-auto">
 
-                {/* Header */}
-                <div className="flex justify-between items-center mb-4">
+                    {/* Scanner Header */}
+                    <div className="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 className="text-xl font-extrabold text-gray-900">
+                                Scan Event Ticket
+                            </h3>
 
-                    <div>
-                        <h3 className="text-xl font-extrabold text-gray-900">
-                            Scan Event Ticket
-                        </h3>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Scan the attendee's QR code to verify entry.
+                            </p>
+                        </div>
 
-                        <p className="text-sm text-gray-500 mt-1">
-                            Scan the attendee's QR code to verify entry.
-                        </p>
+                        {/* This X closes the entire scanner */}
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="text-3xl text-gray-500 hover:text-black"
+                            aria-label="Close scanner"
+                        >
+                            ×
+                        </button>
                     </div>
 
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="text-3xl text-gray-500 hover:text-black transition"
-                        aria-label="Close scanner"
-                    >
-                        ×
-                    </button>
-
-                </div>
-
-                {/* Camera status */}
-                <div className="mb-4">
-
-                    <div className="flex items-center gap-2">
-
+                    {/* Camera Status */}
+                    <div className="mb-4 flex items-center gap-2">
                         <span
                             className={`h-2.5 w-2.5 rounded-full ${
                                 cameraReady
@@ -218,12 +202,10 @@ const TicketScanner = ({ onDetected, onClose }) => {
                         <p className="text-sm font-semibold text-gray-700">
                             {status}
                         </p>
-
                     </div>
 
                     {error && (
-                        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3">
-
+                        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
                             <p className="text-sm text-red-700">
                                 {error}
                             </p>
@@ -235,59 +217,105 @@ const TicketScanner = ({ onDetected, onClose }) => {
                             >
                                 Reload page and try again
                             </button>
-
                         </div>
                     )}
 
+                    {/* QR Camera */}
+                    <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-black">
+                        <div
+                            id="eventora-ticket-reader"
+                            className="w-full"
+                        />
+                    </div>
+
+                    {/* Reopen Instructions */}
+                    {!showInstructions && (
+                        <button
+                            type="button"
+                            onClick={() => setShowInstructions(true)}
+                            className="mt-4 text-sm font-semibold text-gray-600 underline"
+                        >
+                            View scanning instructions
+                        </button>
+                    )}
+
+                    {/* Scanner Footer */}
+                    <div className="mt-4 flex justify-end">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+                        >
+                            Close Scanner
+                        </button>
+                    </div>
                 </div>
-
-                {/* QR Scanner */}
-                <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-black">
-
-                    <div
-                        id="eventora-ticket-reader"
-                        className="w-full"
-                    />
-
-                </div>
-
-                {/* Instructions */}
-                <div className="mt-4 rounded-lg bg-gray-50 p-3">
-
-                    <p className="text-sm font-semibold text-gray-800">
-                        Scanning instructions
-                    </p>
-
-                    <ul className="mt-2 space-y-1 text-xs text-gray-600">
-
-                        <li>• Allow camera permission in your browser.</li>
-
-                        <li>• Position the attendee QR code inside the scanning box.</li>
-
-                        <li>• Keep the QR code clearly visible and steady.</li>
-
-                        <li>• Use HTTPS when accessing the deployed website.</li>
-
-                    </ul>
-
-                </div>
-
-                {/* Footer */}
-                <div className="mt-4 flex justify-end">
-
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition"
-                    >
-                        Close Scanner
-                    </button>
-
-                </div>
-
             </div>
 
-        </div>
+            {/* Separate Instructions Popup */}
+            {showInstructions && (
+                <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
+
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-2xl font-extrabold text-gray-900">
+                                Scan Event Ticket
+                            </h2>
+
+                            {/* This X ONLY closes instructions */}
+                            <button
+                                type="button"
+                                onClick={() => setShowInstructions(false)}
+                                className="text-3xl text-gray-500 hover:text-black"
+                                aria-label="Close instructions"
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <p className="text-gray-500 mt-2">
+                            Scan the attendee's QR code to verify entry.
+                        </p>
+
+                        <div className="flex items-center gap-3 mt-5">
+                            <span className={`h-3 w-3 rounded-full ${
+                                cameraReady ? 'bg-green-500' : 'bg-yellow-500'
+                            }`} />
+
+                            <p className="text-sm font-semibold text-gray-700">
+                                {status}
+                            </p>
+                        </div>
+
+                        <hr className="my-5" />
+
+                        <div className="rounded-xl bg-gray-50 p-4">
+                            <h3 className="font-bold text-gray-800">
+                                Scanning instructions
+                            </h3>
+
+                            <ul className="mt-3 space-y-2 text-sm text-gray-600">
+                                <li>• Allow camera permission in your browser.</li>
+                                <li>• Position the attendee QR code inside the scanning box.</li>
+                                <li>• Keep the QR code clearly visible and steady.</li>
+                                <li>• Use HTTPS when accessing the deployed website.</li>
+                            </ul>
+                        </div>
+
+                        <div className="mt-6 flex justify-end">
+                            <button
+                                type="button"
+                                onClick={() => setShowInstructions(false)}
+                                className="rounded-lg bg-black px-6 py-3 font-semibold text-white hover:bg-gray-800"
+                            >
+                                Continue Scanning
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 
