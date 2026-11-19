@@ -248,7 +248,7 @@ const PaymentPage = () => {
                 </div>
             </header>
 
-            <div className="mx-auto max-w-7xl px-4 py-7 sm:px-7 sm:py-10">
+            <div className="payment-content mx-auto max-w-7xl px-4 py-7 sm:px-7 sm:py-10">
 
                 {/* Page Heading */}
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -300,11 +300,11 @@ const PaymentPage = () => {
 
                 <form
                     onSubmit={submit}
-                    className="grid items-start gap-6 lg:grid-cols-[1.04fr_.96fr]"
+                    className="payment-form grid items-start gap-6 lg:grid-cols-[1.04fr_.96fr]"
                 >
 
                     {/* LEFT SIDE */}
-                    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+                    <section className="payment-booking-panel overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
 
                         <div className="border-b border-gray-200 px-5 py-5 sm:px-7">
                             <p className="text-sm font-bold uppercase tracking-[.16em] text-gray-500">
@@ -319,7 +319,7 @@ const PaymentPage = () => {
                         <div className="p-5 sm:p-7">
 
                             {/* Event Card */}
-                            <div className="flex min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+                            <div className="payment-event-card flex min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
 
                                 {event.image && (
                                     <img
@@ -486,7 +486,7 @@ const PaymentPage = () => {
 
                                 <button
                                     disabled={busy}
-                                    className="w-full rounded-xl border border-gray-900 bg-gray-950 px-5 py-4 text-sm font-extrabold text-white shadow-md transition duration-200 hover:-translate-y-0.5 hover:border-gray-700 hover:bg-black hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+                                    className="payment-submit w-full rounded-xl border border-gray-900 bg-gray-950 px-5 py-4 text-sm font-extrabold text-white shadow-md transition duration-200 hover:-translate-y-0.5 hover:border-gray-700 hover:bg-black hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
                                 >
                                     {busy
                                         ? 'Submitting booking...'
@@ -503,7 +503,7 @@ const PaymentPage = () => {
                     </section>
 
                     {/* RIGHT SIDE - PAYMENT */}
-                    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+                    <section className="payment-method-panel overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
 
                         <div className="border-b border-gray-200 px-5 py-5 sm:px-7">
                             <p className="text-sm font-bold uppercase tracking-[.16em] text-gray-500">
@@ -519,16 +519,26 @@ const PaymentPage = () => {
 
                             <div className="p-5 sm:p-7">
 
-                                {/* UPI Brand Names */}
-                                <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 border-b border-gray-100 pb-5 text-sm font-bold text-gray-600">
-                                    <span>PhonePe</span>
-                                    <span>Google Pay</span>
-                                    <span>Paytm</span>
-                                    <span>super.money</span>
+                                {/* UPI Brand Names - continuous left-to-right scrolling */}
+                                <div className="upi-marquee border-b border-gray-100 pb-5" aria-label="Supported UPI payment apps">
+                                    <div className="upi-marquee-track">
+                                        <div className="upi-marquee-group">
+                                            <span>PhonePe</span>
+                                            <span>Google Pay</span>
+                                            <span>Paytm</span>
+                                            <span>super.money</span>
+                                        </div>
+                                        <div className="upi-marquee-group" aria-hidden="true">
+                                            <span>PhonePe</span>
+                                            <span>Google Pay</span>
+                                            <span>Paytm</span>
+                                            <span>super.money</span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* QR Payment Card */}
-                                <div className="mx-auto mt-6 flex max-w-md flex-col items-center rounded-2xl border border-gray-200 bg-gray-50 px-4 py-7 shadow-sm sm:px-6">
+                                <div className="payment-qr-card mx-auto mt-6 flex max-w-md flex-col items-center rounded-2xl border border-gray-200 bg-gray-50 px-4 py-7 shadow-sm sm:px-6">
 
                                     <div className="flex items-center gap-2">
                                         <span className="h-2 w-2 rounded-full bg-gray-900 animate-pulse" />
@@ -682,6 +692,203 @@ const PaymentPage = () => {
                     100% {
                         top: 100%;
                         opacity: 0;
+                    }
+                }
+
+                .upi-marquee {
+                    width: 100%;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    mask-image: linear-gradient(
+                        90deg,
+                        transparent 0,
+                        #000 7%,
+                        #000 93%,
+                        transparent 100%
+                    );
+                }
+
+                .upi-marquee-track {
+                    display: flex;
+                    width: max-content;
+                    animation: upiMarqueeRight 16s linear infinite;
+                    will-change: transform;
+                }
+
+                .upi-marquee-group {
+                    display: flex;
+                    flex-shrink: 0;
+                    align-items: center;
+                    justify-content: space-around;
+                    gap: 2.5rem;
+                    padding: 0 1.25rem;
+                }
+
+                .upi-marquee-group span {
+                    color: #4b5563;
+                    font-size: 0.875rem;
+                    font-weight: 700;
+                }
+
+                @keyframes upiMarqueeRight {
+                    from {
+                        transform: translateX(-50%);
+                    }
+                    to {
+                        transform: translateX(0);
+                    }
+                }
+
+                .upi-marquee:hover .upi-marquee-track {
+                    animation-play-state: paused;
+                }
+
+                /* Mobile checkout layout */
+                @media (max-width: 640px) {
+                    .payment-screen {
+                        overflow-x: hidden;
+                    }
+
+                    .payment-screen header > div {
+                        padding-top: 0.65rem;
+                        padding-bottom: 0.65rem;
+                    }
+
+                    .payment-screen header .h-11 {
+                        width: 2.35rem;
+                        height: 2.35rem;
+                        border-radius: 0.7rem;
+                        font-size: 1.1rem;
+                    }
+
+                    .payment-screen header button {
+                        width: 2.25rem;
+                        height: 2.25rem;
+                    }
+
+                    .payment-content {
+                        padding: 1.1rem 0.85rem 1.5rem;
+                    }
+
+                    .payment-content > div:first-child {
+                        margin-bottom: 1.15rem;
+                        gap: 0.65rem;
+                    }
+
+                    .payment-content h1 {
+                        font-size: clamp(1.65rem, 7vw, 2rem);
+                        line-height: 1.12;
+                    }
+
+                    .payment-form {
+                        gap: 1rem;
+                    }
+
+                    /* Show the QR/payment panel before OTP and screenshot fields on phones. */
+                    .payment-method-panel {
+                        order: 1;
+                    }
+
+                    .payment-booking-panel {
+                        order: 2;
+                    }
+
+                    .payment-method-panel > div:first-child,
+                    .payment-booking-panel > div:first-child {
+                        padding: 1rem 1.1rem;
+                    }
+
+                    .payment-method-panel > div:first-child h2,
+                    .payment-booking-panel > div:first-child h2 {
+                        font-size: 1.05rem;
+                        line-height: 1.35;
+                    }
+
+                    .payment-method-panel > div:nth-child(2),
+                    .payment-booking-panel > div:nth-child(2) {
+                        padding: 1rem;
+                    }
+
+                    .payment-event-card {
+                        align-items: stretch;
+                    }
+
+                    .payment-event-card img {
+                        width: 6rem;
+                        min-height: 6.25rem;
+                        height: auto;
+                        object-fit: cover;
+                    }
+
+                    .payment-event-card > div {
+                        padding: 0.75rem;
+                    }
+
+                    .payment-event-card p:first-child {
+                        font-size: 0.9rem;
+                        line-height: 1.3;
+                    }
+
+                    .payment-event-card p:not(:first-child) {
+                        font-size: 0.75rem;
+                        line-height: 1.35;
+                    }
+
+                    .payment-qr-card {
+                        margin-top: 1rem;
+                        padding: 1.25rem 0.85rem;
+                    }
+
+                    .payment-qr-card .qr-scan-container {
+                        padding: 0.55rem;
+                    }
+
+                    .payment-qr-card .qr-scan-container img {
+                        width: min(68vw, 16rem);
+                        height: min(68vw, 16rem);
+                    }
+
+                    .payment-qr-card > p:nth-last-of-type(2) {
+                        font-size: 1.7rem;
+                    }
+
+                    .upi-marquee-group {
+                        gap: 1.6rem;
+                        padding-right: 0.8rem;
+                        padding-left: 0.8rem;
+                    }
+
+                    .upi-marquee-group span {
+                        font-size: 0.8rem;
+                    }
+
+                    .payment-booking-panel .payment-submit {
+                        position: sticky;
+                        bottom: 0.5rem;
+                        z-index: 5;
+                        box-shadow: 0 8px 22px rgba(17, 24, 39, 0.18);
+                    }
+
+                    .payment-screen > div:last-of-type {
+                        margin-top: 1rem;
+                        padding: 0.85rem;
+                    }
+                }
+
+                @media (min-width: 641px) and (max-width: 1023px) {
+                    .payment-method-panel {
+                        order: 1;
+                    }
+
+                    .payment-booking-panel {
+                        order: 2;
+                    }
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .upi-marquee-track {
+                        animation: none;
+                        transform: none;
                     }
                 }
 
