@@ -276,92 +276,108 @@ const AdminDashboard = () => {
                     </section>
 
                     <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-                        <div className="flex items-center justify-between gap-3 border-b border-gray-100 p-4 sm:p-5">
-                            <div><h2 className="text-lg font-extrabold tracking-tight text-gray-950 sm:text-xl">Booking Requests</h2><p className="mt-1 text-sm text-gray-500">Review uploaded UPI payment screenshots before approving paid bookings.</p></div>
-                            <span className="shrink-0 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-extrabold text-amber-800 ring-1 ring-inset ring-amber-200">{bookings.length} requests</span>
+                        <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                            <div>
+                                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-gray-500">Reservation management</p>
+                                <h2 className="mt-1 text-xl font-extrabold tracking-tight text-gray-950">Booking Requests</h2>
+                                <p className="mt-1 text-sm text-gray-500">Review attendee details and payment evidence before processing each request.</p>
+                            </div>
+                            <div className="flex items-center gap-2 self-start rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 sm:self-center">
+                                <span className="h-2 w-2 rounded-full bg-amber-500" />
+                                <span className="text-sm font-bold text-gray-800">{bookings.length}</span>
+                                <span className="text-xs font-medium text-gray-500">total requests</span>
+                            </div>
                         </div>
-                        <ul className="divide-y divide-gray-100">
-                            {bookings.length === 0 ? <li className="p-8 text-center text-gray-500">No booking requests yet.</li> :
-                                bookings.map(booking => (
-                                    <li key={booking._id} className={`border-l-4 p-4 transition sm:p-5 ${booking.status === 'pending' ? 'border-l-yellow-400' : booking.status === 'confirmed' ? 'border-l-green-400' : 'border-l-red-400'}`}>
-                                        <div className="flex flex-col sm:flex-row justify-between gap-3 mb-3">
-                                            <div><h4 className="font-bold text-gray-900 text-lg">{booking.eventId?.title || 'Deleted Event'}</h4><p className="text-sm text-gray-500 mt-1">{booking.userId?.name} · {booking.userId?.email}</p></div>
-                                            <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end">
-                                                <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ring-1 ring-inset ${
-                                                    booking.status === 'confirmed'
-                                                        ? 'bg-green-50 text-green-700 ring-green-200'
-                                                        : booking.status === 'cancelled'
-                                                            ? 'bg-red-50 text-red-700 ring-red-200'
-                                                            : 'bg-amber-50 text-amber-800 ring-amber-200'
-                                                }`}>
-                                                    {booking.status === 'confirmed'
-                                                        ? <FaCheckCircle />
-                                                        : booking.status === 'cancelled'
-                                                            ? <FaTimesCircle />
-                                                            : <FaHourglassHalf />}
-                                                    {booking.status === 'confirmed' ? 'Confirmed' : booking.status === 'cancelled' ? 'Rejected' : 'Pending review'}
-                                                </span>
-                                                {booking.status !== 'cancelled' && (
-                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ring-1 ring-inset ${
-                                                        booking.paymentStatus === 'paid'
-                                                            ? 'bg-blue-50 text-blue-700 ring-blue-200'
-                                                            : 'bg-gray-100 text-gray-700 ring-gray-200'
-                                                    }`}>
-                                                        {booking.paymentStatus === 'paid' ? 'Paid' : 'Not paid'}
+
+                        <div className="space-y-3 bg-gray-50/70 p-3 sm:space-y-4 sm:p-5">
+                            {bookings.length === 0 ? (
+                                <div className="rounded-xl border border-dashed border-gray-300 bg-white px-5 py-12 text-center">
+                                    <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-gray-100 text-gray-500">
+                                        <FaUsers className="text-lg" />
+                                    </div>
+                                    <h3 className="mt-3 text-sm font-bold text-gray-900">No booking requests yet</h3>
+                                    <p className="mt-1 text-sm text-gray-500">New reservations will appear here when attendees book an event.</p>
+                                </div>
+                            ) : bookings.map(booking => {
+                                const isPending = booking.status === 'pending';
+                                const isConfirmed = booking.status === 'confirmed';
+                                const paymentIsPaid = booking.paymentStatus === 'paid';
+
+                                return (
+                                    <article key={booking._id} className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:border-gray-300 hover:shadow-md">
+                                        <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
+                                            <div className="min-w-0">
+                                                <div className="mb-2 flex flex-wrap items-center gap-2">
+                                                    {isPending ? (
+                                                        <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-800 ring-1 ring-inset ring-amber-200"><FaHourglassHalf /> Action required</span>
+                                                    ) : isConfirmed ? (
+                                                        <span className="inline-flex items-center gap-1.5 rounded-md bg-green-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-green-700 ring-1 ring-inset ring-green-200"><FaCheckCircle /> Confirmed</span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1.5 rounded-md bg-red-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-red-700 ring-1 ring-inset ring-red-200"><FaTimesCircle /> Rejected</span>
+                                                    )}
+                                                    <span className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset ${paymentIsPaid ? 'bg-blue-50 text-blue-700 ring-blue-200' : 'bg-gray-100 text-gray-600 ring-gray-200'}`}>
+                                                        <span className={`h-1.5 w-1.5 rounded-full ${paymentIsPaid ? 'bg-blue-600' : 'bg-gray-400'}`} />
+                                                        {paymentIsPaid ? 'Payment marked paid' : 'Payment not marked paid'}
                                                     </span>
+                                                </div>
+                                                <h3 className="break-words text-base font-extrabold leading-snug text-gray-950 sm:text-lg">{booking.eventId?.title || 'Deleted Event'}</h3>
+                                                <p className="mt-1 break-all text-xs text-gray-500 sm:text-sm">
+                                                    {booking.userId?.name || 'Unknown attendee'} <span className="px-1 text-gray-300">|</span> {booking.userId?.email || 'No email available'}
+                                                </p>
+                                            </div>
+                                            <div className="shrink-0 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 sm:text-right">
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Booking reference</p>
+                                                <p className="mt-0.5 font-mono text-xs font-bold text-gray-800">#{booking._id.slice(-8).toUpperCase()}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-px border-b border-gray-100 bg-gray-200 sm:grid-cols-4">
+                                            <div className="bg-white px-4 py-3 sm:px-5"><p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Booking amount</p><p className="mt-1 text-base font-extrabold text-gray-950">{booking.amount === 0 ? 'Free' : `₹${Number(booking.amount || 0).toLocaleString('en-IN')}`}</p></div>
+                                            <div className="bg-white px-4 py-3 sm:px-5"><p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Tickets</p><p className="mt-1 text-base font-extrabold text-gray-950">{booking.quantity || 1}</p></div>
+                                            <div className="bg-white px-4 py-3 sm:px-5"><p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Requested on</p><p className="mt-1 text-xs font-semibold leading-relaxed text-gray-800">{booking.bookedAt ? new Date(booking.bookedAt).toLocaleString() : '—'}</p></div>
+                                            <div className="bg-white px-4 py-3 sm:px-5"><p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Seats remaining</p><p className="mt-1 text-base font-extrabold text-gray-950">{booking.eventId?.availableSeats ?? '—'}</p></div>
+                                        </div>
+
+                                        {booking.amount > 0 && (
+                                            <div className="flex flex-col gap-2 border-b border-gray-100 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                                                <div className="min-w-0">
+                                                    <p className="text-xs font-bold text-gray-800">Payment evidence</p>
+                                                    <p className="mt-0.5 text-xs text-gray-500">{booking.paymentProofUploadedAt ? `Uploaded ${new Date(booking.paymentProofUploadedAt).toLocaleString()}` : 'No payment screenshot has been uploaded'}</p>
+                                                </div>
+                                                {booking.paymentProofUploadedAt ? (
+                                                    <button type="button" onClick={() => handleViewPaymentProof(booking._id)} disabled={proofLoading === booking._id} className="inline-flex min-h-10 items-center justify-center gap-2 self-start rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-800 transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-wait disabled:opacity-50 sm:self-center">
+                                                        {proofLoading === booking._id ? <><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-800" /> Loading proof...</> : 'View payment proof'}
+                                                    </button>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1.5 self-start rounded-md bg-amber-50 px-2.5 py-1.5 text-[11px] font-semibold text-amber-800 ring-1 ring-inset ring-amber-200"><FaHourglassHalf /> Awaiting evidence</span>
                                                 )}
                                             </div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm sm:grid-cols-4 sm:p-4">
-                                            <div><p className="text-xs uppercase text-gray-400 font-bold">Amount</p><p className="font-bold text-gray-900">{booking.amount === 0 ? 'Free' : `₹${booking.amount}`}</p></div>
-                                            <div><p className="text-xs uppercase text-gray-400 font-bold">Tickets</p><p className="font-bold text-gray-900">{booking.quantity || 1}</p></div>
-                                            <div><p className="text-xs uppercase text-gray-400 font-bold">Requested</p><p className="font-semibold text-gray-700">{new Date(booking.bookedAt).toLocaleString()}</p></div>
-                                            <div><p className="text-xs uppercase text-gray-400 font-bold">Seats left</p><p className="font-bold text-gray-900">{booking.eventId?.availableSeats ?? '—'}</p></div>
-                                        </div>
-                                        {booking.amount > 0 && (
-                                            <div className="mt-3 flex flex-wrap items-center gap-3">
-                                                {booking.paymentProofUploadedAt ? (
-                                                    <>
-                                                        <button onClick={() => handleViewPaymentProof(booking._id)} disabled={proofLoading === booking._id} className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-bold text-gray-800 transition hover:bg-gray-100 disabled:opacity-50">
-                                                            {proofLoading === booking._id ? 'Loading screenshot...' : 'View Payment Screenshot'}
-                                                        </button>
-                                                        <span className="text-xs text-gray-500">Uploaded {new Date(booking.paymentProofUploadedAt).toLocaleString()}</span>
-                                                    </>
-                                                ) : <span className="text-xs font-semibold text-amber-700">No payment screenshot uploaded</span>}
-                                            </div>
                                         )}
-                                        {booking.status === 'pending' && (
-                                            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                                                <button
-                                                    disabled={!!processingBooking}
-                                                    onClick={() => handleConfirmBooking(booking._id, 'paid')}
-                                                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-green-700 bg-green-700 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-green-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                                >
-                                                    <FaCheckCircle />
-                                                    {processingBooking === booking._id ? 'Processing...' : 'Approve as Paid'}
+
+                                        {isPending ? (
+                                            <div className="flex flex-col gap-2 bg-white p-4 sm:flex-row sm:justify-end sm:px-5">
+                                                <button type="button" disabled={!!processingBooking} onClick={() => handleConfirmBooking(booking._id, 'paid')} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-green-700 bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-40">
+                                                    <FaCheckCircle /> {processingBooking === booking._id ? 'Processing...' : 'Approve as paid'}
                                                 </button>
-                                                <button
-                                                    disabled={!!processingBooking}
-                                                    onClick={() => handleConfirmBooking(booking._id, 'not_paid')}
-                                                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-900 bg-gray-950 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-black hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                                >
-                                                    <FaCheck />
-                                                    {processingBooking === booking._id ? 'Processing...' : 'Approve Undecided'}
+                                                <button type="button" disabled={!!processingBooking} onClick={() => handleConfirmBooking(booking._id, 'not_paid')} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-gray-900 bg-gray-950 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-black focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-40">
+                                                    <FaCheck /> {processingBooking === booking._id ? 'Processing...' : 'Approve undecided'}
                                                 </button>
-                                                <button
-                                                    disabled={!!processingBooking}
-                                                    onClick={() => handleCancelBooking(booking._id)}
-                                                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-red-700 bg-red-700 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-red-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                                >
-                                                    <FaTimesCircle />
-                                                    Reject
+                                                <button type="button" disabled={!!processingBooking} onClick={() => handleCancelBooking(booking._id)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-red-700 bg-red-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-32">
+                                                    <FaTimesCircle /> Reject
                                                 </button>
                                             </div>
+                                        ) : (
+                                            <div className="flex flex-col gap-1.5 bg-gray-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                                                <p className="text-xs font-medium text-gray-600">{isConfirmed ? 'This booking has been reviewed and confirmed.' : 'This booking request was rejected.'}</p>
+                                                <span className={`inline-flex w-fit items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${isConfirmed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                    {isConfirmed ? <FaCheckCircle /> : <FaTimesCircle />} {isConfirmed ? 'Review complete' : 'Request closed'}
+                                                </span>
+                                            </div>
                                         )}
-                                    </li>
-                                ))
-                            }
-                        </ul>
+                                    </article>
+                                );
+                            })}
+                        </div>
                     </section>
                 </div>
             )}
