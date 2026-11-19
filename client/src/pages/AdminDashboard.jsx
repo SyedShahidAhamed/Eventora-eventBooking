@@ -264,7 +264,7 @@ const AdminDashboard = () => {
                             </button>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-100">
+                        <div className="space-y-3 bg-gray-50/70 p-3 sm:space-y-4 sm:p-5">
                             {events.map(event => {
                                 const totalSeats = Math.max(0, Number(event.totalSeats) || 0);
                                 const availableSeats = Math.max(0, Number(event.availableSeats) || 0);
@@ -278,7 +278,7 @@ const AdminDashboard = () => {
                                 return (
                                     <article
                                         key={event._id}
-                                        className="group flex flex-col gap-4 px-4 py-5 transition-colors hover:bg-gray-50/80 sm:px-6 lg:flex-row lg:items-center lg:justify-between"
+                                        className="group flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md sm:p-5 lg:flex-row lg:items-center lg:justify-between"
                                     >
                                         <div className="min-w-0 flex-1">
                                             <div className="flex flex-wrap items-center gap-2">
