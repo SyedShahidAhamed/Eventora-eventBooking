@@ -2,7 +2,7 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const Register = () => {
@@ -17,8 +17,44 @@ const Register = () => {
     const { register, verifyOTP } = useContext(AuthContext);
     const navigate = useNavigate();
 
+    const requirements = [
+        { label: 'At least 8 characters', test: password.length >= 8 },
+        { label: 'One uppercase letter (A-Z)', test: /[A-Z]/.test(password) },
+        { label: 'One lowercase letter (a-z)', test: /[a-z]/.test(password) },
+        { label: 'One number (0-9)', test: /[0-9]/.test(password) },
+        { label: 'One special character (@#$!)', test: /[^A-Za-z0-9]/.test(password) }
+    ];
+
+    const strength = requirements.filter(item => item.test).length;
+
+    const strengthLabel = [
+        'Very Weak',
+        'Weak',
+        'Fair',
+        'Good',
+        'Almost Strong',
+        'Strong'
+    ];
+
+    const strengthColor = [
+        'bg-red-500',
+        'bg-red-500',
+        'bg-orange-500',
+        'bg-yellow-500',
+        'bg-emerald-400',
+        'bg-green-500'
+    ];
+
+    const isPasswordStrong = strength === 5;
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!showOTP && !isPasswordStrong) {
+            toast.error('Please create a strong password.');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -31,7 +67,6 @@ const Register = () => {
                 await verifyOTP(email, otp);
 
                 toast.success('Account created successfully! Welcome to Eventora.');
-
                 navigate('/dashboard');
             }
         } catch (err) {
@@ -46,7 +81,7 @@ const Register = () => {
     };
 
     return (
-        <div className="max-w-md mx-auto mt-16 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+        <div className="max-w-md mx-auto mt-16 mb-10 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
 
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
@@ -98,6 +133,7 @@ const Register = () => {
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     required
+                                    autoComplete="new-password"
                                     className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-700 transition shadow-sm"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
@@ -112,6 +148,64 @@ const Register = () => {
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </button>
                             </div>
+
+                            {/* Password Strength */}
+                            {password.length > 0 && (
+                                <div className="mt-3">
+
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-xs font-semibold text-gray-600">
+                                            Password Strength
+                                        </span>
+
+                                        <span className={`text-xs font-bold ${
+                                            strength <= 1 ? 'text-red-500' :
+                                            strength === 2 ? 'text-orange-500' :
+                                            strength === 3 ? 'text-yellow-600' :
+                                            strength === 4 ? 'text-emerald-600' :
+                                            'text-green-600'
+                                        }`}>
+                                            {strengthLabel[strength]}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex gap-1.5">
+                                        {requirements.map((item, index) => (
+                                            <div
+                                                key={index}
+                                                className={`h-1.5 flex-1 rounded-full transition-all ${
+                                                    index < strength
+                                                        ? strengthColor[strength]
+                                                        : 'bg-gray-200'
+                                                }`}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    <div className="mt-3 space-y-2">
+                                        {requirements.map((item, index) => (
+                                            <div
+                                                key={index}
+                                                className="flex items-center gap-2 text-xs"
+                                            >
+                                                {item.test ? (
+                                                    <FaCheckCircle className="text-green-500" />
+                                                ) : (
+                                                    <FaTimesCircle className="text-gray-300" />
+                                                )}
+
+                                                <span className={
+                                                    item.test
+                                                        ? 'text-green-700'
+                                                        : 'text-gray-500'
+                                                }>
+                                                    {item.label}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </>
                 ) : (
@@ -138,8 +232,8 @@ const Register = () => {
 
                 <button
                     type="submit"
-                    disabled={loading}
-                    className="w-full bg-gray-900 text-white font-bold py-3 rounded-lg hover:bg-black focus:ring-4 focus:ring-gray-200 transition shadow-md mt-4 disabled:opacity-60"
+                    disabled={loading || (!showOTP && !isPasswordStrong)}
+                    className="w-full bg-gray-900 text-white font-bold py-3 rounded-lg hover:bg-black focus:ring-4 focus:ring-gray-200 transition shadow-md mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading
                         ? 'Processing...'
