@@ -16,6 +16,7 @@ const EventDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
+    const isAdmin = user?.role === 'admin';
 
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -41,6 +42,7 @@ const EventDetail = () => {
 
     const startBooking = async () => {
         if (!user) return navigate('/login');
+        if (isAdmin) return;
         if (bookingLoading || !event) return;
 
         setBookingLoading(true);
@@ -124,198 +126,221 @@ const EventDetail = () => {
 
                     {/* Booking Details */}
                     <aside className="bg-gray-50 p-6 rounded-xl border border-gray-100 shadow-sm h-fit">
+                        {isAdmin ? (
+                            <div className="py-5 text-center">
+                                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-200 text-gray-800">
+                                    <FaCheck className="text-xl" />
+                                </div>
+                                <h3 className="text-lg font-extrabold text-gray-900">
+                                    Admin view
+                                </h3>
+                                <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                                    You can view event information, but admin accounts cannot book tickets.
+                                    Use an attendee account to make a reservation.
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/admin')}
+                                    className="mt-5 w-full rounded-xl bg-gray-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-black"
+                                >
+                                    Go to Admin Dashboard
+                                </button>
+                            </div>
+                        ) : (
+                            <>
 
-                        <h3 className="text-xl font-bold text-gray-800 mb-6">
-                            Booking Details
-                        </h3>
+                            <h3 className="text-xl font-bold text-gray-800 mb-6">
+                                Booking Details
+                            </h3>
 
-                        <div className="space-y-4 mb-6">
+                            <div className="space-y-4 mb-6">
 
-                            {/* Ticket Price */}
-                            <div className="flex items-center gap-4 text-gray-600">
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
-                                    <FaMoneyBillWave />
+                                {/* Ticket Price */}
+                                <div className="flex items-center gap-4 text-gray-600">
+                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
+                                        <FaMoneyBillWave />
+                                    </div>
+
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-400 uppercase">
+                                            Ticket Price
+                                        </p>
+
+                                        <p className="font-bold text-gray-800 text-lg">
+                                            {Number(event.ticketPrice) === 0
+                                                ? <span className="text-green-600">Free</span>
+                                                : `₹${event.ticketPrice}`}
+                                        </p>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <p className="text-sm font-semibold text-gray-400 uppercase">
-                                        Ticket Price
-                                    </p>
+                                {/* Availability */}
+                                <div className="flex items-center gap-4 text-gray-600">
+                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
+                                        <FaChair />
+                                    </div>
 
-                                    <p className="font-bold text-gray-800 text-lg">
-                                        {Number(event.ticketPrice) === 0
-                                            ? <span className="text-green-600">Free</span>
-                                            : `₹${event.ticketPrice}`}
-                                    </p>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-400 uppercase">
+                                            Availability
+                                        </p>
+
+                                        <p className="font-bold text-gray-800">
+                                            {event.availableSeats} / {event.totalSeats}
+                                        </p>
+                                    </div>
                                 </div>
+
+                                {/* Date */}
+                                <div className="flex items-center gap-4 text-gray-600">
+                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
+                                        <FaCalendarAlt />
+                                    </div>
+
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-400 uppercase">
+                                            Date
+                                        </p>
+
+                                        <p className="font-bold text-gray-800">
+                                            {new Date(event.date).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Location */}
+                                <div className="flex items-center gap-4 text-gray-600">
+                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
+                                        <FaMapMarkerAlt />
+                                    </div>
+
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-400 uppercase">
+                                            Location
+                                        </p>
+
+                                        <p className="font-bold text-gray-800">
+                                            {event.location}
+                                        </p>
+                                    </div>
+                                </div>
+
                             </div>
 
-                            {/* Availability */}
-                            <div className="flex items-center gap-4 text-gray-600">
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
-                                    <FaChair />
-                                </div>
+                            {/* Custom Ticket Dropdown */}
+                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                Number of tickets (max 5)
+                            </label>
 
-                                <div>
-                                    <p className="text-sm font-semibold text-gray-400 uppercase">
-                                        Availability
-                                    </p>
+                            <div className="relative mb-4">
 
-                                    <p className="font-bold text-gray-800">
-                                        {event.availableSeats} / {event.totalSeats}
-                                    </p>
-                                </div>
+                                {/* Dropdown Button */}
+                                <button
+                                    type="button"
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    disabled={isSoldOut}
+                                    aria-expanded={dropdownOpen}
+                                    aria-haspopup="listbox"
+                                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border bg-white text-gray-800 font-semibold transition-all duration-200 ${
+                                        dropdownOpen
+                                            ? 'border-gray-900 ring-2 ring-gray-900/10 shadow-md'
+                                            : 'border-gray-200 hover:border-gray-400'
+                                    } disabled:opacity-50`}
+                                >
+                                    <span>
+                                        {quantity} {quantity === 1 ? 'ticket' : 'tickets'}
+                                    </span>
+
+                                    <FaChevronDown
+                                        className={`text-gray-500 text-sm transition-transform duration-300 ${
+                                            dropdownOpen ? 'rotate-180' : ''
+                                        }`}
+                                    />
+                                </button>
+
+                                {/* Dropdown Options */}
+                                {dropdownOpen && (
+                                    <>
+                                        <div
+                                            className="fixed inset-0 z-10"
+                                            onClick={() => setDropdownOpen(false)}
+                                        />
+
+                                        <div
+                                            role="listbox"
+                                            aria-label="Select number of tickets"
+                                            className="absolute left-0 right-0 top-full mt-2 z-20 bg-white border border-gray-200 rounded-xl shadow-xl max-h-40 overflow-y-auto overflow-x-hidden py-1 animate-dropdown"
+                                            style={{
+                                                scrollbarWidth: 'thin',
+                                                scrollbarColor: '#9ca3af #f3f4f6'
+                                            }}
+                                        >
+                                            {Array.from(
+                                                { length: maxSelectable },
+                                                (_, i) => i + 1
+                                            ).map(n => (
+                                                <button
+                                                    key={n}
+                                                    type="button"
+                                                    role="option"
+                                                    aria-selected={quantity === n}
+                                                    onClick={() => {
+                                                        setQuantity(n);
+                                                        setDropdownOpen(false);
+                                                    }}
+                                                    className={`w-full flex items-center justify-between px-4 py-3 text-sm font-semibold transition-all duration-150 ${
+                                                        quantity === n
+                                                            ? 'bg-gray-900 text-white'
+                                                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                                                    }`}
+                                                >
+                                                    <span>
+                                                        {n} {n === 1 ? 'ticket' : 'tickets'}
+                                                    </span>
+
+                                                    {quantity === n && (
+                                                        <FaCheck className="text-white text-xs" />
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
-                            {/* Date */}
-                            <div className="flex items-center gap-4 text-gray-600">
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
-                                    <FaCalendarAlt />
-                                </div>
-
-                                <div>
-                                    <p className="text-sm font-semibold text-gray-400 uppercase">
-                                        Date
-                                    </p>
-
-                                    <p className="font-bold text-gray-800">
-                                        {new Date(event.date).toLocaleDateString()}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Location */}
-                            <div className="flex items-center gap-4 text-gray-600">
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-900">
-                                    <FaMapMarkerAlt />
-                                </div>
-
-                                <div>
-                                    <p className="text-sm font-semibold text-gray-400 uppercase">
-                                        Location
-                                    </p>
-
-                                    <p className="font-bold text-gray-800">
-                                        {event.location}
-                                    </p>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {/* Custom Ticket Dropdown */}
-                        <label className="block text-sm font-bold text-gray-700 mb-2">
-                            Number of tickets (max 5)
-                        </label>
-
-                        <div className="relative mb-4">
-
-                            {/* Dropdown Button */}
-                            <button
-                                type="button"
-                                onClick={() => setDropdownOpen(!dropdownOpen)}
-                                disabled={isSoldOut}
-                                aria-expanded={dropdownOpen}
-                                aria-haspopup="listbox"
-                                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border bg-white text-gray-800 font-semibold transition-all duration-200 ${
-                                    dropdownOpen
-                                        ? 'border-gray-900 ring-2 ring-gray-900/10 shadow-md'
-                                        : 'border-gray-200 hover:border-gray-400'
-                                } disabled:opacity-50`}
-                            >
-                                <span>
-                                    {quantity} {quantity === 1 ? 'ticket' : 'tickets'}
+                            {/* Total Amount */}
+                            <div className="flex justify-between items-center text-sm mb-5">
+                                <span className="text-gray-500">
+                                    Total amount
                                 </span>
 
-                                <FaChevronDown
-                                    className={`text-gray-500 text-sm transition-transform duration-300 ${
-                                        dropdownOpen ? 'rotate-180' : ''
-                                    }`}
-                                />
+                                <strong className="text-gray-900 text-lg">
+                                    {totalAmount === 0
+                                        ? 'FREE'
+                                        : `₹${totalAmount.toLocaleString('en-IN')}`}
+                                </strong>
+                            </div>
+
+                            {/* Continue Booking */}
+                            <button
+                                onClick={startBooking}
+                                disabled={isSoldOut || bookingLoading}
+                                className="w-full py-4 px-6 rounded-xl font-bold text-lg shadow-lg bg-gray-900 hover:bg-black text-white disabled:bg-gray-300 transition-all duration-200"
+                            >
+                                {bookingLoading
+                                    ? 'Sending OTP...'
+                                    : isSoldOut
+                                    ? 'Sold Out'
+                                    : 'Continue to Payment'}
                             </button>
 
-                            {/* Dropdown Options */}
-                            {dropdownOpen && (
-                                <>
-                                    <div
-                                        className="fixed inset-0 z-10"
-                                        onClick={() => setDropdownOpen(false)}
-                                    />
-
-                                    <div
-                                        role="listbox"
-                                        aria-label="Select number of tickets"
-                                        className="absolute left-0 right-0 top-full mt-2 z-20 bg-white border border-gray-200 rounded-xl shadow-xl max-h-40 overflow-y-auto overflow-x-hidden py-1 animate-dropdown"
-                                        style={{
-                                            scrollbarWidth: 'thin',
-                                            scrollbarColor: '#9ca3af #f3f4f6'
-                                        }}
-                                    >
-                                        {Array.from(
-                                            { length: maxSelectable },
-                                            (_, i) => i + 1
-                                        ).map(n => (
-                                            <button
-                                                key={n}
-                                                type="button"
-                                                role="option"
-                                                aria-selected={quantity === n}
-                                                onClick={() => {
-                                                    setQuantity(n);
-                                                    setDropdownOpen(false);
-                                                }}
-                                                className={`w-full flex items-center justify-between px-4 py-3 text-sm font-semibold transition-all duration-150 ${
-                                                    quantity === n
-                                                        ? 'bg-gray-900 text-white'
-                                                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                                                }`}
-                                            >
-                                                <span>
-                                                    {n} {n === 1 ? 'ticket' : 'tickets'}
-                                                </span>
-
-                                                {quantity === n && (
-                                                    <FaCheck className="text-white text-xs" />
-                                                )}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
+                            {error && (
+                                <p className="text-red-600 mt-4 text-center text-sm">
+                                    {error}
+                                </p>
                             )}
-                        </div>
-
-                        {/* Total Amount */}
-                        <div className="flex justify-between items-center text-sm mb-5">
-                            <span className="text-gray-500">
-                                Total amount
-                            </span>
-
-                            <strong className="text-gray-900 text-lg">
-                                {totalAmount === 0
-                                    ? 'FREE'
-                                    : `₹${totalAmount.toLocaleString('en-IN')}`}
-                            </strong>
-                        </div>
-
-                        {/* Continue Booking */}
-                        <button
-                            onClick={startBooking}
-                            disabled={isSoldOut || bookingLoading}
-                            className="w-full py-4 px-6 rounded-xl font-bold text-lg shadow-lg bg-gray-900 hover:bg-black text-white disabled:bg-gray-300 transition-all duration-200"
-                        >
-                            {bookingLoading
-                                ? 'Sending OTP...'
-                                : isSoldOut
-                                ? 'Sold Out'
-                                : 'Continue to Payment'}
-                        </button>
-
-                        {error && (
-                            <p className="text-red-600 mt-4 text-center text-sm">
-                                {error}
-                            </p>
+                            </>
                         )}
-
                     </aside>
                 </div>
             </div>
