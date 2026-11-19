@@ -350,7 +350,7 @@ const PaymentPage = () => {
                             {/* Booking Summary */}
                             <div className="my-5 grid grid-cols-2 gap-3">
 
-                                <div className="rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-amber-300">
+                                <div className="rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-gray-300">
                                     <p className="text-sm font-medium text-gray-500">
                                         Tickets
                                     </p>
@@ -361,7 +361,7 @@ const PaymentPage = () => {
                                     </p>
                                 </div>
 
-                                <div className="rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-amber-300">
+                                <div className="rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-gray-300">
                                     <p className="text-sm font-medium text-gray-500">
                                         Total payable
                                     </p>
@@ -375,8 +375,8 @@ const PaymentPage = () => {
 
                             {/* Payment app guidance */}
                             {isPaid && (
-                                <div className="mb-6 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50/70 p-4">
-                                    <FaQrcode className="shrink-0 text-2xl text-amber-700" />
+                                <div className="mb-6 flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
+                                    <FaQrcode className="shrink-0 text-2xl text-gray-700" />
                                     <div>
                                         <p className="text-sm font-bold text-gray-900">
                                             Ready to pay?
@@ -486,7 +486,7 @@ const PaymentPage = () => {
 
                                 <button
                                     disabled={busy}
-                                    className="w-full rounded-xl border border-amber-500 bg-gray-950 px-5 py-4 text-sm font-extrabold text-white shadow-md transition duration-200 hover:-translate-y-0.5 hover:border-amber-400 hover:bg-black hover:shadow-[0_8px_24px_rgba(212,175,55,0.22)] focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+                                    className="w-full rounded-xl border border-gray-900 bg-gray-950 px-5 py-4 text-sm font-extrabold text-white shadow-md transition duration-200 hover:-translate-y-0.5 hover:border-gray-700 hover:bg-black hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
                                 >
                                     {busy
                                         ? 'Submitting booking...'
@@ -528,10 +528,10 @@ const PaymentPage = () => {
                                 </div>
 
                                 {/* QR Payment Card */}
-                                <div className="mx-auto mt-6 flex max-w-md flex-col items-center rounded-2xl border border-amber-200 bg-gradient-to-b from-amber-50/50 to-gray-50 px-4 py-7 shadow-sm sm:px-6">
+                                <div className="mx-auto mt-6 flex max-w-md flex-col items-center rounded-2xl border border-gray-200 bg-gray-50 px-4 py-7 shadow-sm sm:px-6">
 
                                     <div className="flex items-center gap-2">
-                                        <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                                        <span className="h-2 w-2 rounded-full bg-gray-900 animate-pulse" />
                                         <p className="text-sm font-bold uppercase tracking-[.16em] text-gray-600">
                                             Scan to make payment
                                         </p>
@@ -691,7 +691,7 @@ const PaymentPage = () => {
 
                 .qr-scan-frame {
                     box-shadow:
-                        inset 0 0 0 1px rgba(212, 175, 55, 0.28);
+                        inset 0 0 0 1px rgba(0, 0, 0, 0.12);
                 }
 
                 .qr-scan-line {
